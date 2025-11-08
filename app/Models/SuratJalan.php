@@ -18,5 +18,6 @@ class SuratJalan extends Model
         'nama_barang_jasa',
         'qty',
         'jumlah',
+        'nama_pengirim'
     ];
 }
