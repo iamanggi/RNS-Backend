@@ -9,34 +9,18 @@ use Illuminate\Http\Request;
 class StokController extends Controller
 {
     /**
-     * Tampilkan semua stok beserta summary
+     * Tampilkan semua stok
      */
     public function index(Request $request)
     {
-        $query = Stok::with(['barang', 'user']);
-
-        if ($request->barang_id) {
-            $query->where('barang_id', $request->barang_id);
-        }
-
-        if ($request->user_id) {
-            $query->where('user_id', $request->user_id);
-        }
-
-        $stok = $query->latest()->get();
-
-        // Hitung summary
-        $total_masuk = $stok->sum('jumlah'); // total semua stok
-        $total_keluar = $stok->whereNotNull('tgl_keluar')->sum('jumlah'); // total stok keluar
-        $total_sisa = $total_masuk - $total_keluar; // total stok sekarang
+        $stok = Stok::with('user')
+            ->when($request->user_id, fn($q) => $q->where('user_id', $request->user_id))
+            ->latest()
+            ->get();
 
         return response()->json([
-            'data' => $stok,
-            'summary' => [
-                'total_masuk'  => $total_masuk,
-                'total_keluar' => $total_keluar,
-                'total_sisa'   => $total_sisa
-            ]
+            'message' => 'Data stok berhasil diambil.',
+            'data' => $stok
         ]);
     }
 
@@ -46,19 +30,30 @@ class StokController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'barang_id' => 'required|exists:barangs,id',
-            'user_id'   => 'required|exists:users,id',
-            'jumlah'    => 'required|integer|min:1',
-            'tgl_masuk' => 'required|date',
-            'tgl_keluar'=> 'nullable|date|after_or_equal:tgl_masuk',
-            'harga'     => 'required|numeric|min:0'
+            'nama_barang' => 'required|string|max:255',
+            'foto'        => 'nullable|image|max:2048',
+            'video'       => 'nullable|mimetypes:video/mp4,video/avi,video/mov|max:10240',
+            'harga'       => 'required|numeric|min:0',
+            'jumlah'      => 'required|integer|min:1',
+            'tgl_masuk'   => 'required|date',
+            'tgl_keluar'  => 'nullable|date|after_or_equal:tgl_masuk',
+            'user_id'     => 'required|exists:users,id',
         ]);
+
+        // Upload file foto/video jika ada
+        if ($request->hasFile('foto')) {
+            $validated['foto'] = $request->file('foto')->store('stok/foto', 'public');
+        }
+
+        if ($request->hasFile('video')) {
+            $validated['video'] = $request->file('video')->store('stok/video', 'public');
+        }
 
         $stok = Stok::create($validated);
 
         return response()->json([
             'message' => 'Stok berhasil ditambahkan',
-            'data'    => $stok
+            'data' => $stok->load('user')
         ], 201);
     }
 
@@ -67,9 +62,10 @@ class StokController extends Controller
      */
     public function show($id)
     {
-        $stok = Stok::with(['barang', 'user'])->findOrFail($id);
+        $stok = Stok::with('user')->findOrFail($id);
 
         return response()->json([
+            'message' => 'Detail stok berhasil diambil.',
             'data' => $stok
         ]);
     }
@@ -82,19 +78,29 @@ class StokController extends Controller
         $stok = Stok::findOrFail($id);
 
         $validated = $request->validate([
-            'barang_id' => 'required|exists:barangs,id',
-            'user_id'   => 'required|exists:users,id',
-            'jumlah'    => 'required|integer|min:1',
-            'tgl_masuk' => 'required|date',
-            'tgl_keluar'=> 'nullable|date|after_or_equal:tgl_masuk',
-            'harga'     => 'required|numeric|min:0'
+            'nama_barang' => 'required|string|max:255',
+            'foto'        => 'nullable|image|max:2048',
+            'video'       => 'nullable|mimetypes:video/mp4,video/avi,video/mov|max:10240',
+            'harga'       => 'required|numeric|min:0',
+            'jumlah'      => 'required|integer|min:1',
+            'tgl_masuk'   => 'required|date',
+            'tgl_keluar'  => 'nullable|date|after_or_equal:tgl_masuk',
+            'user_id'     => 'required|exists:users,id',
         ]);
+
+        if ($request->hasFile('foto')) {
+            $validated['foto'] = $request->file('foto')->store('stok/foto', 'public');
+        }
+
+        if ($request->hasFile('video')) {
+            $validated['video'] = $request->file('video')->store('stok/video', 'public');
+        }
 
         $stok->update($validated);
 
         return response()->json([
             'message' => 'Stok berhasil diperbarui',
-            'data'    => $stok
+            'data' => $stok->load('user')
         ]);
     }
 

@@ -31,10 +31,11 @@ return new class extends Migration
         });
 
         // Tabel pembelian_items = detail barang yang dibeli
+        // Tabel pembelian_items = detail barang yang dibeli
         Schema::create('pembelian_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('pembelian_id')->constrained('pembelians')->onDelete('cascade');
-            $table->foreignId('barang_id')->constrained('barangs')->onDelete('cascade');
+            $table->string('nama_barang'); // ganti barang_id dengan nama_barang
             $table->integer('jumlah');
             $table->decimal('harga_satuan', 15, 2);
             $table->decimal('total_harga', 15, 2);

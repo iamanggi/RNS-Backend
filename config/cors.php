@@ -13,11 +13,11 @@ return [
     |
     */
 
-    'paths' => ['api/*'], // semua route API akan menggunakan CORS
+    'paths' => ['api/*', 'sanctum/csrf-cookie'], // semua route API akan menggunakan CORS
 
     'allowed_methods' => ['*'], // izinkan semua method (GET, POST, dll)
 
-    'allowed_origins' => ['*'], // izinkan semua domain frontend
+    'allowed_origins' =>  ['http://127.0.0.1:8001'], // izinkan semua domain frontend
 
     'allowed_headers' => ['*'], // izinkan semua header
 
@@ -25,6 +25,6 @@ return [
 
     'max_age' => 0,
 
-    'supports_credentials' => false,
+    'supports_credentials' => true,
 
 ];

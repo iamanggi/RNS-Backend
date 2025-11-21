@@ -13,12 +13,21 @@ return new class extends Migration
     {
         Schema::create('stoks', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('barang_id')->constrained('barangs')->onDelete('cascade');
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->integer('jumlah');
-            $table->date('tgl_masuk');
+
+            // DATA BARANG
+            $table->string('nama_barang');
+            $table->string('foto')->nullable();        // path file
+            $table->string('video')->nullable();       // path file
+            $table->decimal('harga', 15, 2);           // harga barang
+
+            // DATA STOK
+            $table->integer('jumlah');                  // jumlah masuk/keluar
+            $table->date('tgl_masuk')->nullable();
             $table->date('tgl_keluar')->nullable();
-            $table->decimal('harga', 15, 2);
+
+            // USER
+            $table->unsignedBigInteger('user_id');      // siapa yang input
+
             $table->timestamps();
         });
     }

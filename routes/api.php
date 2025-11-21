@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\Api\AuthController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\BarangController;
 use App\Http\Controllers\Api\StokController;
 use App\Http\Controllers\Api\SPHController;
 use App\Http\Controllers\Api\InvoiceController;
@@ -21,14 +20,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/admins/{id}/reject', [AuthController::class, 'rejectAdmin']);
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    // ==========================
-    // Barang
-    // ==========================
-    Route::get('/barangs', [BarangController::class, 'index']);
-    Route::post('/barangs', [BarangController::class, 'store']);
-    Route::get('/barangs/{id}', [BarangController::class, 'show']);
-    Route::put('/barangs/{id}', [BarangController::class, 'update']);
-    Route::delete('/barangs/{id}', [BarangController::class, 'destroy']);
 
     // ==========================
     // Stok

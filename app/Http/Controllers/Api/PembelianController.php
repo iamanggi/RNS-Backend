@@ -11,21 +11,20 @@ use Illuminate\Support\Facades\Validator;
 
 class PembelianController extends Controller
 {
-    // Tampilkan semua pembelian (filter berdasarkan status)
+    // Tampilkan semua pembelian
     public function index(Request $request)
     {
         $status = $request->status; // 'belum_lunas', 'cicilan', 'lunas'
-        $query = Pembelian::with('items.barang')->latest();
+        $query = Pembelian::with('items')->latest();
 
         if ($status) {
             $query->where('status_pembayaran', $status);
         }
 
-        $pembelians = $query->get();
-        return response()->json($pembelians);
+        return response()->json($query->get());
     }
 
-    // Simpan pembelian baru beserta items dan data penerima
+    // Simpan pembelian baru beserta items
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -40,7 +39,7 @@ class PembelianController extends Controller
             'sisa_cicilan'       => 'nullable|numeric',
             'grand_total'        => 'required|numeric',
             'items'              => 'required|array|min:1',
-            'items.*.barang_id'  => 'required|exists:barangs,id',
+            'items.*.nama_barang' => 'required|string',
             'items.*.jumlah'     => 'required|integer|min:1',
             'items.*.harga_satuan' => 'required|numeric',
             'items.*.total_harga'  => 'required|numeric',
@@ -68,7 +67,7 @@ class PembelianController extends Controller
             foreach ($request->items as $item) {
                 PembelianItem::create([
                     'pembelian_id' => $pembelian->id,
-                    'barang_id'    => $item['barang_id'],
+                    'nama_barang'  => $item['nama_barang'],
                     'jumlah'       => $item['jumlah'],
                     'harga_satuan' => $item['harga_satuan'],
                     'total_harga'  => $item['total_harga'],
@@ -76,7 +75,10 @@ class PembelianController extends Controller
             }
 
             DB::commit();
-            return response()->json(['message' => 'Pembelian berhasil disimpan', 'data' => $pembelian->load('items.barang')], 201);
+            return response()->json([
+                'message' => 'Pembelian berhasil disimpan',
+                'data' => $pembelian->load('items')
+            ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['error' => 'Gagal menyimpan pembelian', 'detail' => $e->getMessage()], 500);
@@ -86,7 +88,7 @@ class PembelianController extends Controller
     // Tampilkan detail pembelian
     public function show($id)
     {
-        $pembelian = Pembelian::with('items.barang')->find($id);
+        $pembelian = Pembelian::with('items')->find($id);
         if (!$pembelian) {
             return response()->json(['error' => 'Data tidak ditemukan'], 404);
         }
@@ -112,7 +114,7 @@ class PembelianController extends Controller
             'sisa_cicilan'       => 'nullable|numeric',
             'grand_total'        => 'required|numeric',
             'items'              => 'required|array|min:1',
-            'items.*.barang_id'  => 'required|exists:barangs,id',
+            'items.*.nama_barang' => 'required|string',
             'items.*.jumlah'     => 'required|integer|min:1',
             'items.*.harga_satuan' => 'required|numeric',
             'items.*.total_harga'  => 'required|numeric',
@@ -141,7 +143,7 @@ class PembelianController extends Controller
             foreach ($request->items as $item) {
                 PembelianItem::create([
                     'pembelian_id' => $pembelian->id,
-                    'barang_id'    => $item['barang_id'],
+                    'nama_barang'  => $item['nama_barang'],
                     'jumlah'       => $item['jumlah'],
                     'harga_satuan' => $item['harga_satuan'],
                     'total_harga'  => $item['total_harga'],
@@ -149,7 +151,10 @@ class PembelianController extends Controller
             }
 
             DB::commit();
-            return response()->json(['message' => 'Pembelian berhasil diupdate', 'data' => $pembelian->load('items.barang')], 200);
+            return response()->json([
+                'message' => 'Pembelian berhasil diupdate',
+                'data' => $pembelian->load('items')
+            ], 200);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['error' => 'Gagal update pembelian', 'detail' => $e->getMessage()], 500);
