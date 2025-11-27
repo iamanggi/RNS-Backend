@@ -39,8 +39,4 @@ class PembelianItem extends Model
      * Item pembelian ini memiliki satu Barang.
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function barang()
-    {
-        return $this->belongsTo(Barang::class);
-    }
 }

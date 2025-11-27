@@ -24,19 +24,22 @@ Route::middleware('auth:sanctum')->group(function () {
     // ==========================
     // Stok
     // ==========================
+    Route::get('/stoks/summary', [StokController::class, 'summary']);
+    Route::get('/stoks/weekly-summary', [StokController::class, 'weeklySummary']);
     Route::get('/stoks', [StokController::class, 'index']);
     Route::post('/stoks', [StokController::class, 'store']);
     Route::get('/stoks/{id}', [StokController::class, 'show']);
     Route::put('/stoks/{id}', [StokController::class, 'update']);
     Route::delete('/stoks/{id}', [StokController::class, 'destroy']);
 
+
     // ==========================
     // Pembelian
     // ==========================
-    Route::get('/pembelians', [PembelianController::class, 'index']);        // list semua pembelian
-    Route::post('/pembelians', [PembelianController::class, 'store']);       // buat pembelian baru
-    Route::get('/pembelians/{id}', [PembelianController::class, 'show']);    // detail pembelian
-    Route::put('/pembelians/{id}', [PembelianController::class, 'update']);  // update pembelian
+    Route::get('/pembelians', [PembelianController::class, 'index']);        
+    Route::post('/pembelians', [PembelianController::class, 'store']);      
+    Route::get('/pembelians/{id}', [PembelianController::class, 'show']);    
+    Route::put('/pembelians/{id}', [PembelianController::class, 'update']);  
     Route::delete('/pembelians/{id}', [PembelianController::class, 'destroy']); 
 
     // ==========================

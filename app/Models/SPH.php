@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class SPH extends Model
 {
-   use HasFactory;
+    use HasFactory;
 
     protected $table = 'surat_penawarans';
     protected $fillable = [

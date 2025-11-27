@@ -15,9 +15,6 @@ class User extends Authenticatable implements JWTSubject
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * Kolom yang bisa diisi (mass assignment).
-     */
     protected $fillable = [
         'name',
         'email',
@@ -26,9 +23,6 @@ class User extends Authenticatable implements JWTSubject
         'status',
     ];
 
-    /**
-     * Kolom yang disembunyikan ketika serialisasi model ke array/json.
-     */
     protected $hidden = [
         'password',
         'remember_token',
@@ -44,9 +38,6 @@ class User extends Authenticatable implements JWTSubject
         return [];
     }
 
-    /**
-     * Cast ke tipe data tertentu.
-     */
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];

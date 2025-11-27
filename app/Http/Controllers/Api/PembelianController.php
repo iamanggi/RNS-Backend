@@ -14,7 +14,7 @@ class PembelianController extends Controller
     // Tampilkan semua pembelian
     public function index(Request $request)
     {
-        $status = $request->status; // 'belum_lunas', 'cicilan', 'lunas'
+        $status = $request->status;
         $query = Pembelian::with('items')->latest();
 
         if ($status) {
@@ -138,7 +138,6 @@ class PembelianController extends Controller
                 'grand_total'       => $request->grand_total,
             ]);
 
-            // Hapus items lama & simpan items baru
             PembelianItem::where('pembelian_id', $pembelian->id)->delete();
             foreach ($request->items as $item) {
                 PembelianItem::create([

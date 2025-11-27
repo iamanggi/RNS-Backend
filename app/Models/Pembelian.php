@@ -18,7 +18,7 @@ class Pembelian extends Model
      */
     protected $fillable = [
         'no_order',
-        'penerima_nama',      // diganti dari pembeli_id
+        'penerima_nama',
         'penerima_alamat',
         'penerima_telepon',
         'tgl_transaksi',

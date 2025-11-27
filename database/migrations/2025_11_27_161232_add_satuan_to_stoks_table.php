@@ -9,15 +9,15 @@ return new class extends Migration
 
     public function up(): void
     {
-        Schema::table('surat_jalans', function (Blueprint $table) {
-            $table->string('nama_pengirim')->after('telp_penerima');
+        Schema::table('stoks', function (Blueprint $table) {
+            $table->string('satuan')->default('pcs')->after('jumlah');
         });
     }
 
     public function down(): void
     {
-        Schema::table('surat_jalans', function (Blueprint $table) {
-            //
+        Schema::table('stoks', function (Blueprint $table) {
+            $table->dropColumn('satuan');
         });
     }
 };
