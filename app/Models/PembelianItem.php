@@ -19,6 +19,7 @@ class PembelianItem extends Model
     protected $fillable = [
         'pembelian_id',
         'barang_id',
+        'nama_barang',
         'jumlah',
         'harga_satuan',
         'total_harga',

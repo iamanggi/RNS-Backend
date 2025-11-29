@@ -34,7 +34,7 @@ class PembelianController extends Controller
             'penerima_telepon'   => 'nullable|string',
             'tgl_transaksi'      => 'required|date',
             'status_pengiriman'  => 'required|in:dikirim,menunggu,cicilan',
-            'status_pembayaran'  => 'required|in:cicilan,lunas,belum_lunas',
+            'status_pembayaran'  => 'nullable|in:cicilan,lunas,belum_lunas',
             'total_cicilan'      => 'nullable|numeric',
             'sisa_cicilan'       => 'nullable|numeric',
             'grand_total'        => 'required|numeric',
