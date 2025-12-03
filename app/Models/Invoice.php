@@ -11,6 +11,7 @@ class Invoice extends Model
 
     protected $fillable = [
         'nomor_invoice',
+        'pembelian_id',
         'nama_penerima',
         'tanggal_invoice',
         'nama_barang',
@@ -23,6 +24,12 @@ class Invoice extends Model
     protected $casts = [
         'tanggal_invoice' => 'date',
     ];
+
+
+    public function pembelian()
+    {
+        return $this->belongsTo(Pembelian::class);
+    }
 
     public function items()
     {

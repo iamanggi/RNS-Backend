@@ -19,6 +19,7 @@ class PembelianItem extends Model
     protected $fillable = [
         'pembelian_id',
         'barang_id',
+        'nama_barang',
         'jumlah',
         'harga_satuan',
         'total_harga',
@@ -39,4 +40,8 @@ class PembelianItem extends Model
      * Item pembelian ini memiliki satu Barang.
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
+    public function barang()
+    {
+        return $this->belongsTo(Stok::class, 'barang_id');
+    }
 }

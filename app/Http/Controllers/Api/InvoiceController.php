@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Invoice;
+use App\Models\Pembelian;
 use Illuminate\Http\Request;
 
 class InvoiceController extends Controller
@@ -18,10 +19,11 @@ class InvoiceController extends Controller
         $data = $request->validate([
             'tanggal_invoice' => 'nullable|date',
             'nama_penerima' => 'required|string',
-            'items' => 'required|array',
-            'items.*.nama_barang' => 'required|string',
-            'items.*.qty' => 'required|integer',
-            'items.*.harga_satuan' => 'required|numeric',
+            'pembelian_id' => 'nullable|exists:pembelians,id',
+            'items' => 'nullable|array',
+            'items.*.nama_barang' => 'required_without:pembelian_id|string',
+            'items.*.qty' => 'required_without:pembelian_id|integer',
+            'items.*.harga_satuan' => 'required_without:pembelian_id|numeric',
         ]);
 
         $tanggal = $data['tanggal_invoice'] ?? now()->format('Y-m-d');
@@ -54,23 +56,41 @@ class InvoiceController extends Controller
 
         $nomorInvoice = "{$newNumber}/{$kode}/{$bulanRomawi}/{$tahun}";
 
-        $totalPembayaran = collect($data['items'])->sum(fn($item) => $item['qty'] * $item['harga_satuan']);
-
         $invoice = Invoice::create([
             'tanggal_invoice' => $tanggal,
             'nomor_invoice' => $nomorInvoice,
             'nama_penerima' => $data['nama_penerima'],
-            'total_pembayaran' => $totalPembayaran,
+            'pembelian_id' => $data['pembelian_id'] ?? null,
+            'total_pembayaran' => 0, // Will be updated
         ]);
 
-        foreach ($data['items'] as $item) {
-            $invoice->items()->create([
-                'nama_barang' => $item['nama_barang'],
-                'qty' => $item['qty'],
-                'harga_satuan' => $item['harga_satuan'],
-                'total_harga' => $item['qty'] * $item['harga_satuan'],
-            ]);
+        $totalPembayaran = 0;
+
+        if (!empty($data['pembelian_id'])) {
+            $pembelian = Pembelian::with('items')->findOrFail($data['pembelian_id']);
+            foreach ($pembelian->items as $item) {
+                $invoice->items()->create([
+                    'nama_barang' => $item->nama_barang,
+                    'qty' => $item->jumlah,
+                    'harga_satuan' => $item->harga_satuan,
+                    'total_harga' => $item->total_harga,
+                ]);
+                $totalPembayaran += $item->total_harga;
+            }
+        } elseif (!empty($data['items'])) {
+            foreach ($data['items'] as $item) {
+                $totalHarga = $item['qty'] * $item['harga_satuan'];
+                $invoice->items()->create([
+                    'nama_barang' => $item['nama_barang'],
+                    'qty' => $item['qty'],
+                    'harga_satuan' => $item['harga_satuan'],
+                    'total_harga' => $totalHarga,
+                ]);
+                $totalPembayaran += $totalHarga;
+            }
         }
+
+        $invoice->update(['total_pembayaran' => $totalPembayaran]);
 
         return response()->json([
             'message' => 'Invoice berhasil dibuat',

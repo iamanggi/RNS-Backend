@@ -49,4 +49,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('invoice', InvoiceController::class);
     Route::apiResource('kwitansi', KwitansiController::class);
     Route::apiResource('surat-jalan', SuratJalanController::class);
+    
 });

@@ -38,4 +38,9 @@ class Pembelian extends Model
     {
         return $this->hasMany(PembelianItem::class);
     }
+
+    public function invoice()
+    {
+        return $this->hasOne(Invoice::class);
+    }
 }

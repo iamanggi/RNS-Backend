@@ -14,7 +14,7 @@ class InvoiceItem extends Model
         'nama_barang',
         'qty',
         'harga_satuan',
-        'total_harga'
+        'total_harga',
     ];
 
     public function invoice()
