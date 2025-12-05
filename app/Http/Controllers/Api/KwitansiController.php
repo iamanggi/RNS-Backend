@@ -21,7 +21,6 @@ class KwitansiController extends Controller
             'alamat_penerima' => 'required|string',
             'total_pembayaran' => 'required|numeric',
             'keterangan' => 'nullable|string',
-            'status' => 'nullable|string', 
             'tanggal' => 'nullable|date',
         ]);
 
@@ -63,7 +62,6 @@ class KwitansiController extends Controller
             'total_pembayaran' => $data['total_pembayaran'],
             'total_bilangan' => $total_bilangan,
             'keterangan' => $data['keterangan'] ?? null,
-            'status' => $data['status'] ?? 'Lunas', // 3. Simpan status
         ]);
 
         return response()->json([
@@ -87,7 +85,6 @@ class KwitansiController extends Controller
             'alamat_penerima' => 'nullable|string',
             'total_pembayaran' => 'nullable|numeric',
             'keterangan' => 'nullable|string',
-            'status' => 'nullable|string',
             'tanggal' => 'nullable|date',
         ]);
 
