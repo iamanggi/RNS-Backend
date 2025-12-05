@@ -13,13 +13,13 @@ return [
     |
     */
 
-    'paths' => ['api/*', 'sanctum/csrf-cookie'], // semua route API akan menggunakan CORS
+    'paths' => ['api/*', 'sanctum/csrf-cookie'], 
 
-    'allowed_methods' => ['*'], // izinkan semua method (GET, POST, dll)
+    'allowed_methods' => ['*'], 
 
-    'allowed_origins' =>  ['http://127.0.0.1:8001'], // izinkan semua domain frontend
+    'allowed_origins' =>  ['http://127.0.0.1:8001'], 
 
-    'allowed_headers' => ['*'], // izinkan semua header
+    'allowed_headers' => ['*'], 
 
     'exposed_headers' => [],
 

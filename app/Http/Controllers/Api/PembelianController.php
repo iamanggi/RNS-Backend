@@ -14,7 +14,7 @@ class PembelianController extends Controller
     // Tampilkan semua pembelian
     public function index(Request $request)
     {
-        $status = $request->status; // 'belum_lunas', 'cicilan', 'lunas'
+        $status = $request->status;
         $query = Pembelian::with('items')->latest();
 
         if ($status) {
@@ -34,7 +34,7 @@ class PembelianController extends Controller
             'penerima_telepon'   => 'nullable|string',
             'tgl_transaksi'      => 'required|date',
             'status_pengiriman'  => 'required|in:dikirim,menunggu,cicilan',
-            'status_pembayaran'  => 'required|in:cicilan,lunas,belum_lunas',
+            'status_pembayaran'  => 'nullable|in:cicilan,lunas,belum_lunas',
             'total_cicilan'      => 'nullable|numeric',
             'sisa_cicilan'       => 'nullable|numeric',
             'grand_total'        => 'required|numeric',
@@ -109,7 +109,7 @@ class PembelianController extends Controller
             'penerima_telepon'   => 'nullable|string',
             'tgl_transaksi'      => 'required|date',
             'status_pengiriman'  => 'required|in:dikirim,menunggu,cicilan',
-            'status_pembayaran'  => 'required|in:cicilan,lunas,belum_lunas',
+            'status_pembayaran'  => 'nullable|in:cicilan,lunas,belum_lunas',
             'total_cicilan'      => 'nullable|numeric',
             'sisa_cicilan'       => 'nullable|numeric',
             'grand_total'        => 'required|numeric',
@@ -138,7 +138,6 @@ class PembelianController extends Controller
                 'grand_total'       => $request->grand_total,
             ]);
 
-            // Hapus items lama & simpan items baru
             PembelianItem::where('pembelian_id', $pembelian->id)->delete();
             foreach ($request->items as $item) {
                 PembelianItem::create([

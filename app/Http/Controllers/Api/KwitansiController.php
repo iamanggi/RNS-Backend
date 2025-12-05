@@ -28,7 +28,6 @@ class KwitansiController extends Controller
         // 2. Gunakan tanggal dari input user, jika kosong baru pakai hari ini
         $tanggal = $data['tanggal'] ?? now()->format('Y-m-d');
 
-        // 🔢 Tentukan bulan romawi & tahun
         $bulan = date('n', strtotime($tanggal));
         $tahun = date('Y', strtotime($tanggal));
         $bulanRomawi = [
@@ -37,17 +36,14 @@ class KwitansiController extends Controller
             11 => 'XI', 12 => 'XII'
         ][$bulan];
 
-        // 🧾 Kode tetap
         $kode = 'RNS/AKUN';
 
-        // 🔍 Ambil nomor terakhir untuk bulan & tahun yang sama
         $last = Kwitansi::whereYear('tanggal', $tahun)
             ->whereMonth('tanggal', $bulan)
             ->where('nomor_kwitansi', 'LIKE', "%/{$kode}/{$bulanRomawi}/{$tahun}")
             ->latest('id')
             ->first();
 
-        // 🚀 Tentukan nomor berikutnya
         if ($last) {
             $lastNumber = (int) explode('/', $last->nomor_kwitansi)[0];
             $newNumber = str_pad($lastNumber + 1, 2, '0', STR_PAD_LEFT);
@@ -55,13 +51,10 @@ class KwitansiController extends Controller
             $newNumber = '01';
         }
 
-        // 📄 Format akhir nomor kwitansi
         $nomor_kwitansi = "{$newNumber}/{$kode}/{$bulanRomawi}/{$tahun}";
 
-        // 💬 Konversi angka ke terbilang
         $total_bilangan = $this->terbilang($data['total_pembayaran']);
 
-        // 💾 Simpan data
         $kwitansi = Kwitansi::create([
             'nomor_kwitansi' => $nomor_kwitansi,
             'tanggal' => $tanggal,
@@ -116,7 +109,6 @@ class KwitansiController extends Controller
         return response()->json(['message' => 'Data berhasil dihapus']);
     }
 
-    // 🔠 Fungsi konversi angka ke terbilang (Indonesia)
     private function terbilang($number)
     {
         $formatter = new \NumberFormatter('id', \NumberFormatter::SPELLOUT);

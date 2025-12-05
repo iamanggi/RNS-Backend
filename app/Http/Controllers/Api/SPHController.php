@@ -28,14 +28,11 @@ class SPHController extends Controller
             'penandatangan' => 'required|string',
         ]);
 
-        // ✅ Jika tanggal tidak diisi, gunakan tanggal hari ini
         $data['tanggal'] = $data['tanggal'] ?? Carbon::now()->toDateString();
 
-        // Ambil tahun dan bulan dari tanggal
         $tahun = date('Y', strtotime($data['tanggal']));
         $bulan = date('n', strtotime($data['tanggal']));
 
-        // Ubah bulan ke Romawi
         $bulanRomawi = [
             1 => 'I',
             2 => 'II',
@@ -51,19 +48,16 @@ class SPHController extends Controller
             12 => 'XII'
         ][$bulan];
 
-        // Tetapkan bagian kode yang tetap
         $kodeSurat = 'SPH';
         $kodeDivisi = 'XRAY';
         $kodePerusahaan = 'RNS';
 
-        // Cek nomor terakhir di tahun & bulan yang sama
         $lastSph = SPH::whereYear('tanggal', $tahun)
             ->whereMonth('tanggal', $bulan)
             ->where('nomor_sph', 'LIKE', "%/{$kodeSurat}/{$kodeDivisi}/{$kodePerusahaan}-%/$tahun")
             ->latest('id')
             ->first();
 
-        // Ambil urutan terakhir lalu tambah 1
         if ($lastSph) {
             $lastNumber = (int) explode('/', $lastSph->nomor_sph)[0];
             $newNumber = str_pad($lastNumber + 1, 2, '0', STR_PAD_LEFT);
@@ -71,10 +65,8 @@ class SPHController extends Controller
             $newNumber = '01';
         }
 
-        // Format nomor: 03/SPH/XRAY/RNS-II/2025
         $nomorSurat = "{$newNumber}/{$kodeSurat}/{$kodeDivisi}/{$kodePerusahaan}-{$bulanRomawi}/{$tahun}";
 
-        // Simpan ke database
         $data['nomor_sph'] = $nomorSurat;
         $sph = SPH::create($data);
 
@@ -95,7 +87,6 @@ class SPHController extends Controller
 {
     $sph = SPH::findOrFail($id);
 
-    // Validasi data
     $data = $request->validate([
         'tanggal' => 'nullable|date',
         'tempat' => 'nullable|string',
@@ -108,13 +99,10 @@ class SPHController extends Controller
         'penandatangan' => 'nullable|string',
     ]);
 
-    // Jika tanggal tidak dikirim, gunakan tanggal lama
     $data['tanggal'] = $data['tanggal'] ?? $sph->tanggal;
 
-    // Pastikan nomor_sph tidak diubah
     unset($data['nomor_sph']);
 
-    // Update data ke database
     $sph->update($data);
 
     return response()->json([

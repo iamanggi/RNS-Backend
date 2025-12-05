@@ -25,14 +25,13 @@ class SuratJalanController extends Controller
             'nama_barang_jasa' => 'required|string|max:255',
             'qty' => 'required|integer|min:1',
             'jumlah' => 'required|numeric|min:0',
-            'nama_pengirim' => 'required|string|max:255', // tambahkan ini
+            'nama_pengirim' => 'required|string|max:255', 
         ]);
 
-        // Jika tanggal tidak dikirim, gunakan tanggal hari ini
         if (!empty($validated['tanggal'])) {
             $validated['tanggal'] = date('Y-m-d', strtotime($validated['tanggal']));
         } else {
-            $validated['tanggal'] = date('Y-m-d'); // default hari ini
+            $validated['tanggal'] = date('Y-m-d'); 
         }
 
         $sj = SuratJalan::create($validated);
@@ -62,7 +61,7 @@ class SuratJalanController extends Controller
             'nama_barang_jasa' => 'sometimes|string|max:255',
             'qty' => 'sometimes|integer|min:1',
             'jumlah' => 'sometimes|numeric|min:0',
-            'nama_pengirim' => 'sometimes|string|max:255', // tambahkan ini
+            'nama_pengirim' => 'sometimes|string|max:255', 
         ]);
 
         $sj->update($validated);

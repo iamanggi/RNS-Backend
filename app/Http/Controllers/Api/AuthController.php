@@ -61,7 +61,6 @@ class AuthController extends Controller
             return response()->json(['message' => 'Akun belum disetujui oleh owner.'], 403);
         }
 
-        // Buat token Sanctum
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
@@ -86,7 +85,7 @@ class AuthController extends Controller
      */
     public function listAllUsers(Request $request)
     {
-        $user = $request->user(); // Ambil dari token Sanctum
+        $user = $request->user();
 
         if (!$user || $user->role !== 'owner') {
             return response()->json(['message' => 'Akses ditolak. Hanya owner yang bisa melihat daftar user.'], 403);

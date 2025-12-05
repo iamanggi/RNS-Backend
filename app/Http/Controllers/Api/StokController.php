@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Stok;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class StokController extends Controller
 {
@@ -35,12 +36,18 @@ class StokController extends Controller
             'video'       => 'nullable|mimetypes:video/mp4,video/avi,video/mov|max:10240',
             'harga'       => 'required|numeric|min:0',
             'jumlah'      => 'required|integer|min:1',
+            'satuan'      => 'nullable|string|in:pcs,box,unit,pack,kg,liter',
+            'merek'       => 'nullable|string|max:255',
+            'kode_sku'    => 'nullable|string|max:255',
+            'panjang'     => 'nullable|numeric|min:0',
+            'lebar'       => 'nullable|numeric|min:0',
+            'tinggi'      => 'nullable|numeric|min:0',
+            'berat'       => 'nullable|numeric|min:0',
             'tgl_masuk'   => 'required|date',
             'tgl_keluar'  => 'nullable|date|after_or_equal:tgl_masuk',
             'user_id'     => 'required|exists:users,id',
         ]);
 
-        // Upload file foto/video jika ada
         if ($request->hasFile('foto')) {
             $validated['foto'] = $request->file('foto')->store('stok/foto', 'public');
         }
@@ -83,6 +90,13 @@ class StokController extends Controller
             'video'       => 'nullable|mimetypes:video/mp4,video/avi,video/mov|max:10240',
             'harga'       => 'required|numeric|min:0',
             'jumlah'      => 'required|integer|min:1',
+            'satuan'      => 'nullable|string|in:pcs,box,unit,pack,kg,liter',
+            'merek'       => 'nullable|string|max:255',
+            'kode_sku'    => 'nullable|string|max:255',
+            'panjang'     => 'nullable|numeric|min:0',
+            'lebar'       => 'nullable|numeric|min:0',
+            'tinggi'      => 'nullable|numeric|min:0',
+            'berat'       => 'nullable|numeric|min:0',
             'tgl_masuk'   => 'required|date',
             'tgl_keluar'  => 'nullable|date|after_or_equal:tgl_masuk',
             'user_id'     => 'required|exists:users,id',
@@ -114,6 +128,52 @@ class StokController extends Controller
 
         return response()->json([
             'message' => 'Stok berhasil dihapus'
+        ]);
+    }
+
+    /**
+     * Summary stok masuk, keluar, dan total
+     */
+    public function summary()
+    {
+        $totalMasuk = Stok::whereNotNull('tgl_masuk')->sum('jumlah');
+        $totalKeluar = Stok::whereNotNull('tgl_keluar')->sum('jumlah');
+
+        return response()->json([
+            'total_masuk' => $totalMasuk,
+            'total_keluar' => $totalKeluar,
+            'total_keseluruhan' => $totalMasuk - $totalKeluar,
+        ]);
+    }
+
+    public function weeklySummary()
+    {
+        $now = Carbon::now();
+        $sevenDaysAgo = Carbon::now()->subDays(7);
+
+        // Total keseluruhan saat ini
+        $totalMasuk = Stok::whereNotNull('tgl_masuk')->sum('jumlah');
+        $totalKeluar = Stok::whereNotNull('tgl_keluar')->sum('jumlah');
+        $totalSekarang = $totalMasuk - $totalKeluar;
+
+        // Total keseluruhan 7 hari lalu
+        $totalMasukLalu = Stok::where('tgl_masuk', '<', $sevenDaysAgo)->sum('jumlah');
+        $totalKeluarLalu = Stok::where('tgl_keluar', '<', $sevenDaysAgo)->sum('jumlah');
+        $total7HariLalu = $totalMasukLalu - $totalKeluarLalu;
+
+        // Hitung persentase
+        $persenTotal = ($total7HariLalu != 0)
+            ? (($totalSekarang - $total7HariLalu) / abs($total7HariLalu)) * 100
+            : 100;
+
+        return response()->json([
+            'masuk_7hari' => $masuk7Hari ?? 0,
+            'keluar_7hari' => $keluar7Hari ?? 0,
+            'persen_masuk' => round($persenMasuk ?? 0, 1),
+            'persen_keluar' => round($persenKeluar ?? 0, 1),
+
+            'total_keseluruhan' => $totalSekarang,
+            'persen_total' => round($persenTotal, 1),
         ]);
     }
 }

@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
    public function up(): void
     {
         Schema::create('kwitansis', function (Blueprint $table) {
@@ -20,15 +17,11 @@ return new class extends Migration
             $table->decimal('total_pembayaran', 15, 2)->default(0);
             $table->string('total_bilangan')->nullable();
             $table->string('keterangan')->default('Lunas');
-            $table->string('status')->default('belum diterima'); // belum diterima, diterima
+            $table->string('status')->default('belum diterima'); 
             $table->timestamps();
         });
     }
 
-
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('kwitansis');
