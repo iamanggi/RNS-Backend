@@ -15,15 +15,18 @@ class KwitansiController extends Controller
 
     public function store(Request $request)
     {
+        // 1. Tambahkan 'status' dan 'tanggal' ke validasi
         $data = $request->validate([
             'nama_penerima' => 'required|string',
             'alamat_penerima' => 'required|string',
             'total_pembayaran' => 'required|numeric',
             'keterangan' => 'nullable|string',
+            'status' => 'nullable|string', 
+            'tanggal' => 'nullable|date',
         ]);
 
-        // ✅ Tanggal default: hari ini
-        $tanggal = now()->format('Y-m-d');
+        // 2. Gunakan tanggal dari input user, jika kosong baru pakai hari ini
+        $tanggal = $data['tanggal'] ?? now()->format('Y-m-d');
 
         // 🔢 Tentukan bulan romawi & tahun
         $bulan = date('n', strtotime($tanggal));
@@ -66,7 +69,8 @@ class KwitansiController extends Controller
             'alamat_penerima' => $data['alamat_penerima'],
             'total_pembayaran' => $data['total_pembayaran'],
             'total_bilangan' => $total_bilangan,
-            'keterangan' => $data['keterangan'] ?? 'Lunas',
+            'keterangan' => $data['keterangan'] ?? null,
+            'status' => $data['status'] ?? 'Lunas', // 3. Simpan status
         ]);
 
         return response()->json([
@@ -83,11 +87,15 @@ class KwitansiController extends Controller
     public function update(Request $request, $id)
     {
         $kwitansi = Kwitansi::findOrFail($id);
+        
+        // Tambahkan validasi untuk update juga
         $data = $request->validate([
             'nama_penerima' => 'nullable|string',
             'alamat_penerima' => 'nullable|string',
             'total_pembayaran' => 'nullable|numeric',
             'keterangan' => 'nullable|string',
+            'status' => 'nullable|string',
+            'tanggal' => 'nullable|date',
         ]);
 
         if (isset($data['total_pembayaran'])) {
